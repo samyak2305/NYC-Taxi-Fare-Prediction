@@ -1,57 +1,95 @@
+# NYC Taxi Fare Prediction 🚕
 
-# NYC Taxi Fare Prediction 🚕 
+A machine learning regression project that predicts New York City taxi fares from trip coordinates, pickup time, passenger count, trip distance, and proximity to selected landmarks.
 
-A machine learning regression project that predicts New York City taxi fares using trip details, geographical coordinates, and pickup time.
+**Best recorded validation RMSE: 3.9825 (XGBoost)**
 
-## 📌 Project Overview
+## Project Overview
 
-This project explores the NYC Taxi Fare Prediction dataset and applies multiple machine learning algorithms to estimate taxi fares. It covers data preprocessing, exploratory data analysis, feature engineering, model training, and evaluation.
+This project explores the Kaggle NYC Taxi Fare Prediction dataset and compares regression models for estimating taxi fares. The notebook covers data exploration, cleaning, feature engineering, model training, evaluation, and XGBoost hyperparameter exploration.
 
-## 🎯 Objectives
+## Dataset
 
-- Analyze taxi trip data and identify features associated with taxi fares.
-- Clean the data and handle invalid records and outliers.
-- Engineer features from pickup time and geographical coordinates.
-- Train and compare regression models.
-- Evaluate model performance using Root Mean Squared Error (RMSE).
+The notebook's saved outputs show an initial working sample of **552,450 training rows** and **9,914 competition test rows**. The model evaluation after feature engineering and filtering used **431,098 training rows** and **107,742 validation rows**.
 
-## 🛠️ Technologies Used
+Download the dataset from the [Kaggle NYC Taxi Fare Prediction competition](https://www.kaggle.com/competitions/new-york-city-taxi-fare-prediction/data).
+
+Keep the large CSV files locally; they are not included in this GitHub repository. If your files are in the `data/` folder, update the notebook paths to `data/train.csv` and `data/test.csv` as needed.
+
+## Workflow
+
+1. Load and inspect the training and competition test data.
+2. Split the training sample into training and validation sets.
+3. Establish a mean-prediction baseline and evaluate an initial linear regression model.
+4. Extract pickup year, month, day, weekday, and hour from the pickup timestamp.
+5. Calculate trip distance using the Haversine formula.
+6. Calculate drop-off distances to five landmarks:
+   - John F. Kennedy International Airport (JFK)
+   - LaGuardia Airport (LGA)
+   - Newark Liberty International Airport (EWR)
+   - Metropolitan Museum of Art (MET)
+   - World Trade Center (WTC)
+7. Filter implausible fares, coordinates, and passenger counts.
+8. Train and compare Ridge Regression, Random Forest, and XGBoost.
+9. Explore XGBoost hyperparameters using training and validation RMSE.
+
+## Models and Results
+
+The following metrics are taken from the notebook's saved outputs. **RMSE (Root Mean Squared Error)** measures prediction error in fare units; lower is better.
+
+### Models after feature engineering and filtering
+
+| Model | Training RMSE | Validation RMSE |
+|---|---:|---:|
+| Ridge Regression (`alpha=0.9`) | 5.0493 | 5.2178 |
+| Random Forest (`50` trees, `max_depth=10`) | 3.5979 | 4.1630 |
+| XGBoost (default estimator settings, `random_state=42`) | 3.1158 | 4.0137 |
+| **Final XGBoost** (`500` estimators, `max_depth=5`) | **3.1858** | **3.9825** |
+
+The final XGBoost configuration uses:
+
+- `n_estimators=500`
+- `max_depth=5`
+- `learning_rate=0.1`
+- `subsample=0.8`
+- `colsample_bytree=0.8`
+- `objective="reg:squarederror"`
+- `random_state=42`
+- `n_jobs=-1`
+
+### Initial Baseline (Before Feature Engineering)
+
+| Model | Training RMSE | Validation RMSE |
+|---|---:|---:|
+| Mean fare baseline | 9.7898 | 9.9000 |
+| Linear Regression | 9.7886 | 9.9000 |
+
+These baseline results come from an earlier stage and a different data split, so they should be treated as an initial reference rather than a perfectly controlled comparison.
+
+### Key Findings
+
+- The final XGBoost model achieved the lowest recorded validation RMSE among the feature-engineered models: **3.9825**.
+- It slightly outperformed the earlier XGBoost model (**4.0137**) and Random Forest (**4.1630**) on validation RMSE.
+- Feature engineering included pickup-time components, Haversine trip distance, and distances to selected landmarks.
+- The notebook explores XGBoost hyperparameters including estimator count, tree depth, and learning rate.
+
+> These metrics are from saved notebook outputs, not a fresh rerun. Results may change with different data, filtering, splits, library versions, or model settings. The competition test dataset has no fare labels, so the validation RMSE is not a Kaggle test-set score.
+
+## Technologies Used
 
 - Python
 - NumPy
-- Pandas
+- pandas
 - Matplotlib
-- Scikit-learn
+- scikit-learn
 - XGBoost
 - Jupyter Notebook
 
-## 📊 Machine Learning Workflow
-
-1. Load and explore the dataset.
-2. Prepare training and validation datasets.
-3. Establish a baseline using mean fare prediction.
-4. Train a Linear Regression model.
-5. Engineer features:
-   - Extract year, month, day, weekday, and hour from pickup datetime.
-   - Calculate trip distance using the Haversine formula.
-   - Calculate distances to selected landmarks.
-6. Filter invalid records and outliers.
-7. Train Ridge Regression, Random Forest, and XGBoost models.
-8. Compare model performance using RMSE and explore hyperparameters.
-
-## 🤖 Models Implemented
-
-- Mean Baseline Regressor
-- Linear Regression
-- Ridge Regression
-- Random Forest Regressor
-- XGBoost Regressor
-
-## 📁 Project Structure
+## Project Structure
 
 ```text
 NYC-Taxi-Fare-Prediction/
-├── data/
+├── data/                         # Local dataset files; not committed
 │   ├── train.csv
 │   └── test.csv
 ├── nyc_taxi_fare_prediction.ipynb
@@ -59,87 +97,60 @@ NYC-Taxi-Fare-Prediction/
 └── requirements.txt
 ```
 
-## 📂 Dataset
+## Setup and Usage
 
-This project uses the [NYC Taxi Fare Prediction dataset on Kaggle](https://www.kaggle.com/competitions/new-york-city-taxi-fare-prediction/data).
-
-The dataset files are:
-
-- `train.csv` — training data
-- `test.csv` — test data
-
-Download them from the Kaggle competition page and place them inside the local `data/` folder.
-
-**Important:** The training dataset is approximately 5.5 GB. Do not upload it directly to GitHub. Download it separately from Kaggle when reproducing this project.
-
-## ⚙️ Installation and Usage
-
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/samyak2305/NYC-Taxi-Fare-Prediction.git
 cd NYC-Taxi-Fare-Prediction
 ```
 
-### 2. Create a virtual environment
+### 2. Create and Activate a Virtual Environment
 
-```bash
+**Windows PowerShell:**
+
+```powershell
 python -m venv .venv
+.venv\Scripts\Activate.ps1
 ```
 
-Activate it on Windows:
+**macOS/Linux:**
 
 ```bash
-.venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 3. Install dependencies
+### 3. Install Dependencies
 
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Download the dataset
+### 4. Download the Dataset
 
-Download `train.csv` and `test.csv` from Kaggle and place them inside the `data/` folder.
+Download `train.csv` and `test.csv` from the [Kaggle competition page](https://www.kaggle.com/competitions/new-york-city-taxi-fare-prediction/data).
 
-### 5. Update dataset paths
+Place them in your local data directory and ensure the notebook's file paths match their location. Do not commit the large CSV files to GitHub.
 
-Make sure the notebook loads the files using the correct relative paths:
+### 5. Run the Notebook
 
-```python
-train_path = "data/train.csv"
-test_path = "data/test.csv"
-```
+Open `nyc_taxi_fare_prediction.ipynb` in VS Code or Jupyter Notebook and run the cells in order.
 
-Adapt these lines to your notebook's existing loading code if necessary.
+## Limitations
 
-### 6. Run the notebook
+- Results are based on saved notebook outputs and should be rechecked after a fresh, end-to-end execution.
+- Filtering rules for invalid fares and geographic coordinates affect the evaluation dataset.
+- Validation RMSE is not a score on the unlabeled competition test set.
+- The dataset is governed by Kaggle's competition terms.
 
-Open `nyc_taxi_fare_prediction.ipynb` in VS Code or Jupyter Notebook and execute the cells in order.
+## Author
 
-## 📈 Evaluation Metric
-
-The models are evaluated using **Root Mean Squared Error (RMSE)**. A lower RMSE indicates more accurate predictions on the evaluation data.
-
-Add the final model results after running the notebook and verifying the metrics.
-
-## 🔍 Key Learning Outcomes
-
-- Exploratory data analysis and data cleaning
-- Feature engineering for date/time and geographical data
-- Regression algorithms and ensemble learning
-- Model evaluation and hyperparameter tuning
-- Building an end-to-end machine learning workflow
-
-## 👨‍💻 Author
-
-**Samyak Gaikwad**
-
+**Samyak Gaikwad**  
 GitHub: [@samyak2305](https://github.com/samyak2305)
 
-## 🙌 Acknowledgements
+## Repository
 
-- freeCodeCamp for the machine learning learning resource
-- Kaggle for the NYC Taxi Fare Prediction dataset
+[NYC-Taxi-Fare-Prediction](https://github.com/samyak2305/NYC-Taxi-Fare-Prediction)
