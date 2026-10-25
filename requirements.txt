@@ -1,0 +1,7 @@
+numpy
+pandas
+matplotlib
+scikit-learn>=1.4
+xgboost
+jupyter
+ipykernel
